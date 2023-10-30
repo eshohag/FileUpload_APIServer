@@ -46,5 +46,35 @@ namespace FileUpload_APIServer
                 Console.WriteLine($"File upload failed. Status code: {response.StatusCode}");
             }
         }
+        public static void DownloadFile()
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("userName:password")));
+
+            // Add form fields
+            using var formData = new MultipartFormDataContent();
+            formData.Add(new StringContent("001"), "appCode");
+            formData.Add(new StringContent("M001"), "moduleCode");
+            formData.Add(new StringContent(@"\AgentRemitFileUpload\2023\07\"), "relativePath");
+            formData.Add(new StringContent("5657214460Amir Faisal_09Jul2023_144637PM.jpg"), "fileName");
+
+            var response = httpClient.PostAsync("https://localhost:7091/api/FileOperation/DownloadFile", formData).Result;
+
+            // Check the response status
+            if (response.IsSuccessStatusCode)
+            {
+                Stream streamToReadFrom = response.Content.ReadAsStreamAsync().Result;
+
+                // File uploaded successfully
+                Console.WriteLine("File uploaded successfully.");
+            }
+
+            else
+            {
+                // File upload failed
+                Console.WriteLine($"File upload failed. Status code: {response.StatusCode}");
+            }
+        }
     }
 }
